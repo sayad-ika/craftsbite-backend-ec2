@@ -1,0 +1,1 @@
+-- No-op: column is part of initial schema

@@ -1,0 +1,3 @@
+ALTER TABLE bulk_opt_outs
+    ADD COLUMN IF NOT EXISTS override_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    ADD COLUMN IF NOT EXISTS override_reason TEXT;
