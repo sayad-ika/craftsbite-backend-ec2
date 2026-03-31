@@ -27,7 +27,16 @@ func NewHeadcountHandler(headcountService services.HeadcountService, hub *sse.Hu
 }
 
 // GetTodayHeadcount returns today's and tomorrow's headcount summary
-// GET /api/headcount/today
+// @Summary Get today's headcount
+// @Description Get today's and tomorrow's meal headcount summary (Admin/Logistics only)
+// @Tags headcount
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Headcount retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /headcount/today [get]
 func (h *HeadcountHandler) GetTodayHeadcount(c *gin.Context) {
 	summary, err := h.headcountService.GetTodayHeadcount()
 	if err != nil {
@@ -39,7 +48,17 @@ func (h *HeadcountHandler) GetTodayHeadcount(c *gin.Context) {
 }
 
 // GetHeadcountByDate returns headcount summary for a specific date
-// GET /api/headcount/:date
+// @Summary Get headcount by date
+// @Description Get meal headcount summary for a specific date (Admin/Logistics only)
+// @Tags headcount
+// @Produce json
+// @Security BearerAuth
+// @Param date path string true "Date (YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "Headcount retrieved successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /headcount/{date} [get]
 func (h *HeadcountHandler) GetHeadcountByDate(c *gin.Context) {
 	// Get date from URL parameter
 	date := c.Param("date")
@@ -58,7 +77,18 @@ func (h *HeadcountHandler) GetHeadcountByDate(c *gin.Context) {
 }
 
 // GetDetailedHeadcount returns detailed headcount for a specific date and meal
-// GET /api/headcount/:date/:meal_type
+// @Summary Get detailed headcount
+// @Description Get detailed headcount breakdown for a specific date and meal type (Admin/Logistics only)
+// @Tags headcount
+// @Produce json
+// @Security BearerAuth
+// @Param date path string true "Date (YYYY-MM-DD)"
+// @Param meal_type path string true "Meal type (breakfast/lunch/dinner)"
+// @Success 200 {object} map[string]interface{} "Detailed headcount retrieved successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /headcount/{date}/{meal_type} [get]
 func (h *HeadcountHandler) GetDetailedHeadcount(c *gin.Context) {
 	// Get parameters from URL
 	date := c.Param("date")
@@ -78,6 +108,18 @@ func (h *HeadcountHandler) GetDetailedHeadcount(c *gin.Context) {
 	utils.SuccessResponse(c, 200, details, "Detailed headcount retrieved successfully")
 }
 
+// GetAnnouncement generates announcement message for a specific date
+// @Summary Get announcement
+// @Description Generate meal announcement message for a specific date (Admin/Logistics only)
+// @Tags headcount
+// @Produce json
+// @Security BearerAuth
+// @Param date path string true "Date (YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "Announcement generated successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /headcount/{date}/announcement [get]
 func (h *HeadcountHandler) GetAnnouncement(c *gin.Context) {
     date := c.Param("date")
     if date == "" {
@@ -97,6 +139,18 @@ func (h *HeadcountHandler) GetAnnouncement(c *gin.Context) {
     }, "Announcement generated")
 }
 
+// StreamHeadcount streams real-time headcount updates via SSE
+// @Summary Stream headcount updates
+// @Description Stream real-time headcount updates for a specific date via Server-Sent Events (Admin/Logistics only)
+// @Tags headcount
+// @Produce text/event-stream
+// @Security BearerAuth
+// @Param date path string true "Date (YYYY-MM-DD)"
+// @Success 200 {string} string "SSE stream"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /headcount/{date}/stream [get]
 func (h *HeadcountHandler) StreamHeadcount(c *gin.Context) {
 	date := c.Param("date")
 	if date == "" {
@@ -132,6 +186,18 @@ func (h *HeadcountHandler) StreamHeadcount(c *gin.Context) {
 	})
 }
 
+// GetForecast returns headcount forecast for upcoming days
+// @Summary Get headcount forecast
+// @Description Get meal headcount forecast for upcoming days (Admin/Logistics only)
+// @Tags headcount
+// @Produce json
+// @Security BearerAuth
+// @Param days query int false "Number of days to forecast (default: 7)"
+// @Success 200 {object} map[string]interface{} "Forecast retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /headcount/forecast [get]
 func (h *HeadcountHandler) GetForecast(c *gin.Context) {
     days := 7
     if daysStr := c.Query("days"); daysStr != "" {

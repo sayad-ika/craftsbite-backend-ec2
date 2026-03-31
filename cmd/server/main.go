@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"craftsbite-backend/internal/config"
-	"craftsbite-backend/internal/database"
 	"craftsbite-backend/internal/handlers"
 	"craftsbite-backend/internal/middleware"
 	"craftsbite-backend/internal/repository"
@@ -20,8 +19,31 @@ import (
 	"craftsbite-backend/internal/sse"
 	"craftsbite-backend/pkg/logger"
 
+	_ "craftsbite-backend/docs"
+
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
+
+// @title CraftsBite API
+// @version 1.0
+// @description CraftsBite Backend API for meal management system
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.email support@craftsbite.com
+
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+
+// @host localhost:8080
+// @BasePath /api/v1
+// @schemes http https
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
 	// Load configuration
@@ -59,14 +81,15 @@ func main() {
 		fmt.Println("=================================")
 	}
 
-	// Initialize database
-	db, err := database.Connect(&cfg.Database)
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-	defer database.Close(db)
+	// Database connection disabled for EC2 deployment
+	// db, err := database.Connect(&cfg.Database)
+	// if err != nil {
+	// 	log.Fatalf("Failed to connect to database: %v", err)
+	// }
+	// defer database.Close(db)
 
-	// Initialize repositories
+	// Initialize repositories with nil db (disabled)
+	var db *gorm.DB = nil
 	userRepo := repository.NewUserRepository(db)
 	mealRepo := repository.NewMealRepository(db)
 	scheduleRepo := repository.NewScheduleRepository(db)

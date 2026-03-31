@@ -40,6 +40,16 @@ func NewAuthHandler(authService services.AuthService, userService services.UserS
 }
 
 // Login handles user login
+// @Summary User login
+// @Description Authenticate user with email and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body LoginRequest true "Login credentials"
+// @Success 200 {object} map[string]interface{} "Login successful"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Invalid credentials"
+// @Router /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -65,6 +75,15 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 // Register handles user registration
+// @Summary Register new user
+// @Description Create a new user account and auto-login
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param request body RegisterRequest true "Registration details"
+// @Success 201 {object} map[string]interface{} "User registered successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error or registration failed"
+// @Router /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -111,12 +130,29 @@ func (h *AuthHandler) Register(c *gin.Context) {
 }
 
 // Logout handles user logout (placeholder)
+// @Summary User logout
+// @Description Logout current user and clear auth cookie
+// @Tags auth
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Logout successful"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /auth/logout [post]
 func (h *AuthHandler) Logout(c *gin.Context) {
 	expireAuthCookie(c)
 	utils.SuccessResponse(c, 200, nil, "Logout successful")
 }
 
 // GetCurrentUser returns the current authenticated user
+// @Summary Get current user
+// @Description Get authenticated user details
+// @Tags auth
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "User retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 404 {object} map[string]interface{} "User not found"
+// @Router /auth/me [get]
 func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {

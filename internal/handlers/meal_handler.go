@@ -30,7 +30,15 @@ func NewMealHandler(mealService services.MealService, teamRepo repository.TeamRe
 }
 
 // GetTodayMeals returns today's meals and participation status
-// GET /api/meals/today
+// @Summary Get today's meals
+// @Description Get tomorrow's meal schedule and user participation status
+// @Tags meals
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Meals retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /meals/today [get]
 func (h *MealHandler) GetTodayMeals(c *gin.Context) {
 	// Get user ID from context (set by auth middleware)
 	userID, exists := c.Get("user_id")
@@ -49,7 +57,16 @@ func (h *MealHandler) GetTodayMeals(c *gin.Context) {
 }
 
 // GetParticipationByDate returns participation status for a specific date
-// GET /api/meals/participation/:date
+// @Summary Get participation by date
+// @Description Get user's meal participation status for a specific date
+// @Tags meals
+// @Produce json
+// @Security BearerAuth
+// @Param date path string true "Date (YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "Participation retrieved successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /meals/participation/{date} [get]
 func (h *MealHandler) GetParticipationByDate(c *gin.Context) {
 	// Get user ID from context
 	userID, exists := c.Get("user_id")
@@ -82,7 +99,17 @@ type SetParticipationRequest struct {
 }
 
 // SetParticipation sets or updates a user's participation
-// POST /api/meals/participation
+// @Summary Set meal participation
+// @Description Set or update user's participation for a specific meal
+// @Tags meals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body SetParticipationRequest true "Participation details"
+// @Success 200 {object} map[string]interface{} "Participation updated successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /meals/participation [post]
 func (h *MealHandler) SetParticipation(c *gin.Context) {
 	// Get user ID from context
 	userID, exists := c.Get("user_id")
@@ -124,7 +151,18 @@ type OverrideParticipationRequest struct {
 }
 
 // OverrideParticipation allows admins to override a user's participation
-// POST /api/meals/participation/override
+// @Summary Override participation (Admin/Team Lead)
+// @Description Admin or team lead can override user's meal participation
+// @Tags meals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body OverrideParticipationRequest true "Override details"
+// @Success 200 {object} map[string]interface{} "Participation overridden successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /meals/participation/override [post]
 func (h *MealHandler) OverrideParticipation(c *gin.Context) {
 	// Get admin ID from context
 	adminID, exists := c.Get("user_id")
@@ -163,6 +201,17 @@ func (h *MealHandler) OverrideParticipation(c *gin.Context) {
 	utils.SuccessResponse(c, 200, nil, "Participation overridden successfully")
 }
 
+// GetTeamParticipation returns team participation for today
+// @Summary Get team participation
+// @Description Get today's meal participation for team lead's team
+// @Tags meals
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Team participation retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /meals/team-participation [get]
 func (h *MealHandler) GetTeamParticipation(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -182,6 +231,17 @@ func (h *MealHandler) GetTeamParticipation(c *gin.Context) {
 	utils.SuccessResponse(c, 200, response, "Team participation retrieved successfully")
 }
 
+// GetAllTeamsParticipation returns all teams participation for today
+// @Summary Get all teams participation
+// @Description Get today's meal participation for all teams (Admin/Logistics only)
+// @Tags meals
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "All teams participation retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /meals/all-teams-participation [get]
 func (h *MealHandler) GetAllTeamsParticipation(c *gin.Context) {
 	today := time.Now().Format("2006-01-02")
 

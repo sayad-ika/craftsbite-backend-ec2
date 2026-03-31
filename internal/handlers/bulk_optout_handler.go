@@ -20,7 +20,15 @@ func NewBulkOptOutHandler(bulkOptOutService services.BulkOptOutService) *BulkOpt
 }
 
 // GetBulkOptOuts returns all bulk opt-outs for the current user
-// GET /api/v1/meals/bulk-optouts
+// @Summary Get bulk opt-outs
+// @Description Get all bulk opt-outs for current user
+// @Tags meals
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} map[string]interface{} "Bulk opt-outs retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /meals/bulk-optouts [get]
 func (h *BulkOptOutHandler) GetBulkOptOuts(c *gin.Context) {
 	// Get user ID from context (set by auth middleware)
 	userID, exists := c.Get("user_id")
@@ -46,7 +54,17 @@ type CreateBulkOptOutRequest struct {
 }
 
 // CreateBulkOptOut creates a new bulk opt-out for the current user
-// POST /api/v1/meals/bulk-optouts
+// @Summary Create bulk opt-out
+// @Description Create a new bulk opt-out period for current user
+// @Tags meals
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body CreateBulkOptOutRequest true "Bulk opt-out details"
+// @Success 201 {object} map[string]interface{} "Bulk opt-out created successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /meals/bulk-optouts [post]
 func (h *BulkOptOutHandler) CreateBulkOptOut(c *gin.Context) {
 	// Get user ID from context
 	userID, exists := c.Get("user_id")
@@ -79,7 +97,16 @@ func (h *BulkOptOutHandler) CreateBulkOptOut(c *gin.Context) {
 }
 
 // DeleteBulkOptOut deletes a bulk opt-out
-// DELETE /api/v1/meals/bulk-optouts/:id
+// @Summary Delete bulk opt-out
+// @Description Delete a bulk opt-out period
+// @Tags meals
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Bulk opt-out ID"
+// @Success 200 {object} map[string]interface{} "Bulk opt-out deleted successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /meals/bulk-optouts/{id} [delete]
 func (h *BulkOptOutHandler) DeleteBulkOptOut(c *gin.Context) {
 	// Get user ID from context
 	userID, exists := c.Get("user_id")
@@ -113,6 +140,19 @@ type AdminBulkOptOutRequest struct {
 	Reason    string   `json:"reason"     binding:"required"`
 }
 
+// AdminBulkOptOut creates bulk opt-outs for multiple users
+// @Summary Admin bulk opt-out
+// @Description Create bulk opt-outs for multiple users (Admin/Team Lead only)
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body AdminBulkOptOutRequest true "Admin bulk opt-out details"
+// @Success 200 {object} map[string]interface{} "Admin bulk opt-out processed"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /admin/meals/bulk-optouts [post]
 func (h *BulkOptOutHandler) AdminBulkOptOut(c *gin.Context) {
 	actorID, exists := c.Get("user_id")
 	if !exists {

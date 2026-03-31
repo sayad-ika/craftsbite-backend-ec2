@@ -21,7 +21,18 @@ type setLocationRequest struct {
 	Location string `json:"location" binding:"required"`
 }
 
-// POST /api/v1/work-location
+// SetMyWorkLocation sets work location for current user
+// @Summary Set my work location
+// @Description Set work location (office/wfh) for current user on a specific date
+// @Tags work-location
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body setLocationRequest true "Location details"
+// @Success 200 {object} map[string]interface{} "Work location updated successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /work-location [post]
 func (h *WorkLocationHandler) SetMyWorkLocation(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -43,7 +54,17 @@ func (h *WorkLocationHandler) SetMyWorkLocation(c *gin.Context) {
 	utils.SuccessResponse(c, 200, nil, "Work location updated successfully")
 }
 
-// GET /api/v1/work-location?date=YYYY-MM-DD
+// GetMyWorkLocation gets work location for current user
+// @Summary Get my work location
+// @Description Get work location for current user on a specific date
+// @Tags work-location
+// @Produce json
+// @Security BearerAuth
+// @Param date query string true "Date (YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "Work location retrieved"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /work-location [get]
 func (h *WorkLocationHandler) GetMyWorkLocation(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -73,7 +94,19 @@ type adminSetLocationRequest struct {
 	Reason   *string `json:"reason"`
 }
 
-// POST /api/v1/work-location/override
+// SetWorkLocationFor sets work location for another user (Admin/Team Lead)
+// @Summary Override work location
+// @Description Set work location for another user (Admin/Team Lead only)
+// @Tags work-location
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body adminSetLocationRequest true "Override details"
+// @Success 200 {object} map[string]interface{} "Work location corrected successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /work-location/override [post]
 func (h *WorkLocationHandler) SetWorkLocationFor(c *gin.Context) {
 	requesterID, exists := c.Get("user_id")
 	if !exists {
@@ -95,6 +128,18 @@ func (h *WorkLocationHandler) SetWorkLocationFor(c *gin.Context) {
 	utils.SuccessResponse(c, 200, nil, "Work location corrected successfully")
 }
 
+// ListWorkLocationsByDate lists all work locations for a specific date
+// @Summary List work locations by date
+// @Description Get all users' work locations for a specific date (Admin/Team Lead only)
+// @Tags work-location
+// @Produce json
+// @Security BearerAuth
+// @Param date query string true "Date (YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "Work locations retrieved"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /work-location/list [get]
 func (h *WorkLocationHandler) ListWorkLocationsByDate(c *gin.Context) {
 	requesterID, exists := c.Get("user_id")
 	if !exists {
@@ -117,6 +162,17 @@ func (h *WorkLocationHandler) ListWorkLocationsByDate(c *gin.Context) {
 	utils.SuccessResponse(c, 200, result, "Work locations retrieved")
 }
 
+// GetMonthlySummary gets monthly WFH summary for current user
+// @Summary Get monthly WFH summary
+// @Description Get monthly work-from-home summary for current user
+// @Tags work-location
+// @Produce json
+// @Security BearerAuth
+// @Param month query string false "Month (YYYY-MM, defaults to current month)"
+// @Success 200 {object} map[string]interface{} "Monthly WFH summary retrieved"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /work-location/monthly-summary [get]
 func (h *WorkLocationHandler) GetMonthlySummary(c *gin.Context) {
     userID, exists := c.Get("user_id")
     if !exists {
@@ -138,6 +194,18 @@ func (h *WorkLocationHandler) GetMonthlySummary(c *gin.Context) {
     utils.SuccessResponse(c, 200, summary, "Monthly WFH summary retrieved")
 }
 
+// GetTeamMonthlyReport gets monthly WFH report for team
+// @Summary Get team monthly WFH report
+// @Description Get monthly work-from-home report for team (Admin/Logistics/Team Lead only)
+// @Tags work-location
+// @Produce json
+// @Security BearerAuth
+// @Param month query string false "Month (YYYY-MM, defaults to current month)"
+// @Success 200 {object} map[string]interface{} "Monthly WFH report retrieved"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /work-location/team-monthly-report [get]
 func (h *WorkLocationHandler) GetTeamMonthlyReport(c *gin.Context) {
     requesterID, exists := c.Get("user_id")
     if !exists {

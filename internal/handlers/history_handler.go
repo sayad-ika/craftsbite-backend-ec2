@@ -22,7 +22,19 @@ func NewHistoryHandler(historyService services.HistoryService) *HistoryHandler {
 }
 
 // GetHistory returns the participation history for the current user
-// GET /api/v1/meals/history
+// @Summary Get meal history
+// @Description Get meal participation history for current user
+// @Tags meals
+// @Produce json
+// @Security BearerAuth
+// @Param start_date query string false "Start date (YYYY-MM-DD)"
+// @Param end_date query string false "End date (YYYY-MM-DD)"
+// @Param meal_type query string false "Meal type filter"
+// @Param limit query int false "Result limit"
+// @Success 200 {object} map[string]interface{} "History retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /meals/history [get]
 func (h *HistoryHandler) GetHistory(c *gin.Context) {
 	// Get user ID from context (set by auth middleware)
 	userID, exists := c.Get("user_id")
@@ -44,7 +56,19 @@ func (h *HistoryHandler) GetHistory(c *gin.Context) {
 }
 
 // GetAuditTrail returns the audit trail for the current user
-// GET /api/v1/meals/participation-audit
+// @Summary Get participation audit trail
+// @Description Get meal participation audit trail for current user
+// @Tags meals
+// @Produce json
+// @Security BearerAuth
+// @Param start_date query string false "Start date (YYYY-MM-DD)"
+// @Param end_date query string false "End date (YYYY-MM-DD)"
+// @Param meal_type query string false "Meal type filter"
+// @Param limit query int false "Result limit"
+// @Success 200 {object} map[string]interface{} "Audit trail retrieved successfully"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /meals/participation-audit [get]
 func (h *HistoryHandler) GetAuditTrail(c *gin.Context) {
 	// Get user ID from context
 	userID, exists := c.Get("user_id")
@@ -66,7 +90,22 @@ func (h *HistoryHandler) GetAuditTrail(c *gin.Context) {
 }
 
 // GetUserHistoryAdmin returns the participation history for a specific user (admin/logistics only)
-// GET /api/v1/admin/meals/history/:user_id
+// @Summary Get user history (Admin)
+// @Description Get meal participation history for a specific user (Admin/Logistics only)
+// @Tags admin
+// @Produce json
+// @Security BearerAuth
+// @Param user_id path string true "User ID"
+// @Param start_date query string false "Start date (YYYY-MM-DD)"
+// @Param end_date query string false "End date (YYYY-MM-DD)"
+// @Param meal_type query string false "Meal type filter"
+// @Param limit query int false "Result limit"
+// @Success 200 {object} map[string]interface{} "User history retrieved successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /admin/meals/history/{user_id} [get]
 func (h *HistoryHandler) GetUserHistoryAdmin(c *gin.Context) {
 	// Get requester role from context
 	role, exists := c.Get("role")

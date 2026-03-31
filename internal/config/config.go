@@ -193,9 +193,10 @@ func (c *Config) Validate() error {
     if len(c.JWT.Secret) < 32 {
         return fmt.Errorf("JWT_SECRET must be at least 32 characters long")
     }
-    if c.Database.Password == "" {
-        return fmt.Errorf("DB_PASSWORD is required")
-    }
+    // Database password validation disabled for EC2 deployment
+    // if c.Database.Password == "" {
+    //     return fmt.Errorf("DB_PASSWORD is required")
+    // }
 
     validEnvs := map[string]bool{
         "development": true,

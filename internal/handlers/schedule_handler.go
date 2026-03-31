@@ -21,7 +21,17 @@ func NewScheduleHandler(scheduleService services.ScheduleService) *ScheduleHandl
 }
 
 // GetSchedule returns a day schedule for a specific date
-// GET /api/schedules/:date
+// @Summary Get schedule by date
+// @Description Get meal schedule for a specific date
+// @Tags schedules
+// @Produce json
+// @Security BearerAuth
+// @Param date path string true "Date (YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "Schedule retrieved successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 500 {object} map[string]interface{} "Internal error"
+// @Router /schedules/{date} [get]
 func (h *ScheduleHandler) GetSchedule(c *gin.Context) {
 	// Get date from URL parameter
 	date := c.Param("date")
@@ -45,7 +55,17 @@ func (h *ScheduleHandler) GetSchedule(c *gin.Context) {
 }
 
 // GetScheduleRange returns schedules within a date range
-// GET /api/schedules/range?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
+// @Summary Get schedule range
+// @Description Get meal schedules within a date range
+// @Tags schedules
+// @Produce json
+// @Security BearerAuth
+// @Param start_date query string true "Start date (YYYY-MM-DD)"
+// @Param end_date query string true "End date (YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "Schedules retrieved successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /schedules/range [get]
 func (h *ScheduleHandler) GetScheduleRange(c *gin.Context) {
 	startDate := c.Query("start_date")
 	endDate := c.Query("end_date")
@@ -73,7 +93,18 @@ type CreateScheduleRequest struct {
 }
 
 // CreateSchedule creates a new day schedule (Admin and Logistics only)
-// POST /api/schedules
+// @Summary Create schedule
+// @Description Create a new meal schedule (Admin/Logistics only)
+// @Tags schedules
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body CreateScheduleRequest true "Schedule details"
+// @Success 201 {object} map[string]interface{} "Schedule created successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /schedules [post]
 func (h *ScheduleHandler) CreateSchedule(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -119,7 +150,19 @@ type UpdateScheduleRequest struct {
 }
 
 // UpdateSchedule updates an existing day schedule (Admin and Logistics only)
-// PUT /api/schedules/:date
+// @Summary Update schedule
+// @Description Update an existing meal schedule (Admin/Logistics only)
+// @Tags schedules
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param date path string true "Date (YYYY-MM-DD)"
+// @Param request body UpdateScheduleRequest true "Update details"
+// @Success 200 {object} map[string]interface{} "Schedule updated successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /schedules/{date} [put]
 func (h *ScheduleHandler) UpdateSchedule(c *gin.Context) {
 	// Get date from URL parameter
 	date := c.Param("date")
@@ -165,7 +208,17 @@ func (h *ScheduleHandler) UpdateSchedule(c *gin.Context) {
 }
 
 // DeleteSchedule deletes a day schedule (Admin and Logistics only)
-// DELETE /api/schedules/:date
+// @Summary Delete schedule
+// @Description Delete a meal schedule (Admin/Logistics only)
+// @Tags schedules
+// @Produce json
+// @Security BearerAuth
+// @Param date path string true "Date (YYYY-MM-DD)"
+// @Success 200 {object} map[string]interface{} "Schedule deleted successfully"
+// @Failure 400 {object} map[string]interface{} "Validation error"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Failure 403 {object} map[string]interface{} "Forbidden"
+// @Router /schedules/{date} [delete]
 func (h *ScheduleHandler) DeleteSchedule(c *gin.Context) {
 	//Get date from URL parameter
 	date := c.Param("date")

@@ -7,6 +7,8 @@ import (
 	"craftsbite-backend/internal/models"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handlers struct {
@@ -25,6 +27,9 @@ type Handlers struct {
 func RegisterRoutes(router *gin.Engine, h *Handlers, cfg *config.Config) {
     // Health check endpoint (public)
     router.GET("/health", healthCheck(cfg))
+
+    // Swagger documentation endpoint (public, open to all)
+    router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
     v1 := router.Group("/api/v1")
     {

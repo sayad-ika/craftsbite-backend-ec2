@@ -1,0 +1,1863 @@
+basePath: /api/v1
+definitions:
+  handlers.AdminBulkOptOutRequest:
+    properties:
+      end_date:
+        type: string
+      meal_types:
+        items:
+          type: string
+        minItems: 1
+        type: array
+      reason:
+        type: string
+      start_date:
+        type: string
+      user_ids:
+        items:
+          type: string
+        minItems: 1
+        type: array
+    required:
+    - end_date
+    - meal_types
+    - reason
+    - start_date
+    - user_ids
+    type: object
+  handlers.CreateBulkOptOutRequest:
+    properties:
+      end_date:
+        type: string
+      meal_type:
+        type: string
+      start_date:
+        type: string
+    required:
+    - end_date
+    - meal_type
+    - start_date
+    type: object
+  handlers.CreateScheduleRequest:
+    properties:
+      available_meals:
+        items:
+          type: string
+        type: array
+      date:
+        type: string
+      day_status:
+        type: string
+      reason:
+        type: string
+    required:
+    - date
+    - day_status
+    type: object
+  handlers.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  handlers.OverrideParticipationRequest:
+    properties:
+      date:
+        type: string
+      meal_type:
+        type: string
+      participating:
+        type: boolean
+      reason:
+        type: string
+      user_id:
+        type: string
+    required:
+    - date
+    - meal_type
+    - participating
+    - reason
+    - user_id
+    type: object
+  handlers.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      role:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - role
+    type: object
+  handlers.SetParticipationRequest:
+    properties:
+      date:
+        type: string
+      meal_type:
+        type: string
+      participating:
+        type: boolean
+    required:
+    - date
+    - meal_type
+    - participating
+    type: object
+  handlers.UpdatePreferencesRequest:
+    properties:
+      default_meal_preference:
+        type: string
+    required:
+    - default_meal_preference
+    type: object
+  handlers.UpdateScheduleRequest:
+    properties:
+      available_meals:
+        items:
+          type: string
+        type: array
+      day_status:
+        type: string
+      reason:
+        type: string
+    type: object
+  handlers.adminSetLocationRequest:
+    properties:
+      date:
+        type: string
+      location:
+        type: string
+      reason:
+        type: string
+      user_id:
+        type: string
+    required:
+    - date
+    - location
+    - user_id
+    type: object
+  handlers.createWFHPeriodRequest:
+    properties:
+      end_date:
+        type: string
+      reason:
+        type: string
+      start_date:
+        type: string
+    required:
+    - end_date
+    - start_date
+    type: object
+  handlers.setLocationRequest:
+    properties:
+      date:
+        type: string
+      location:
+        type: string
+    required:
+    - date
+    - location
+    type: object
+  models.Role:
+    enum:
+    - employee
+    - team_lead
+    - admin
+    - logistics
+    type: string
+    x-enum-varnames:
+    - RoleEmployee
+    - RoleTeamLead
+    - RoleAdmin
+    - RoleLogistics
+  services.CreateUserInput:
+    properties:
+      default_meal_preference:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      role:
+        $ref: '#/definitions/models.Role'
+    required:
+    - email
+    - name
+    - password
+    - role
+    type: object
+  services.UpdateUserInput:
+    properties:
+      default_meal_preference:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      role:
+        $ref: '#/definitions/models.Role'
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@craftsbite.com
+    name: API Support
+  description: CraftsBite Backend API for meal management system
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: CraftsBite API
+  version: "1.0"
+paths:
+  /admin/meals/bulk-optouts:
+    post:
+      consumes:
+      - application/json
+      description: Create bulk opt-outs for multiple users (Admin/Team Lead only)
+      parameters:
+      - description: Admin bulk opt-out details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AdminBulkOptOutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Admin bulk opt-out processed
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Admin bulk opt-out
+      tags:
+      - admin
+  /admin/meals/history/{user_id}:
+    get:
+      description: Get meal participation history for a specific user (Admin/Logistics
+        only)
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        type: string
+      - description: Meal type filter
+        in: query
+        name: meal_type
+        type: string
+      - description: Result limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User history retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user history (Admin)
+      tags:
+      - admin
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with email and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Invalid credentials
+          schema:
+            additionalProperties: true
+            type: object
+      summary: User login
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Logout current user and clear auth cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logout successful
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: User logout
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: Get authenticated user details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account and auto-login
+      parameters:
+      - description: Registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error or registration failed
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register new user
+      tags:
+      - auth
+  /headcount/{date}:
+    get:
+      description: Get meal headcount summary for a specific date (Admin/Logistics
+        only)
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Headcount retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get headcount by date
+      tags:
+      - headcount
+  /headcount/{date}/{meal_type}:
+    get:
+      description: Get detailed headcount breakdown for a specific date and meal type
+        (Admin/Logistics only)
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      - description: Meal type (breakfast/lunch/dinner)
+        in: path
+        name: meal_type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Detailed headcount retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get detailed headcount
+      tags:
+      - headcount
+  /headcount/{date}/announcement:
+    get:
+      description: Generate meal announcement message for a specific date (Admin/Logistics
+        only)
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Announcement generated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get announcement
+      tags:
+      - headcount
+  /headcount/{date}/stream:
+    get:
+      description: Stream real-time headcount updates for a specific date via Server-Sent
+        Events (Admin/Logistics only)
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      produces:
+      - text/event-stream
+      responses:
+        "200":
+          description: SSE stream
+          schema:
+            type: string
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Stream headcount updates
+      tags:
+      - headcount
+  /headcount/forecast:
+    get:
+      description: Get meal headcount forecast for upcoming days (Admin/Logistics
+        only)
+      parameters:
+      - description: 'Number of days to forecast (default: 7)'
+        in: query
+        name: days
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Forecast retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get headcount forecast
+      tags:
+      - headcount
+  /headcount/today:
+    get:
+      description: Get today's and tomorrow's meal headcount summary (Admin/Logistics
+        only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Headcount retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get today's headcount
+      tags:
+      - headcount
+  /meals/all-teams-participation:
+    get:
+      description: Get today's meal participation for all teams (Admin/Logistics only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: All teams participation retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all teams participation
+      tags:
+      - meals
+  /meals/bulk-optouts:
+    get:
+      description: Get all bulk opt-outs for current user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bulk opt-outs retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get bulk opt-outs
+      tags:
+      - meals
+    post:
+      consumes:
+      - application/json
+      description: Create a new bulk opt-out period for current user
+      parameters:
+      - description: Bulk opt-out details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateBulkOptOutRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Bulk opt-out created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create bulk opt-out
+      tags:
+      - meals
+  /meals/bulk-optouts/{id}:
+    delete:
+      description: Delete a bulk opt-out period
+      parameters:
+      - description: Bulk opt-out ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bulk opt-out deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete bulk opt-out
+      tags:
+      - meals
+  /meals/history:
+    get:
+      description: Get meal participation history for current user
+      parameters:
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        type: string
+      - description: Meal type filter
+        in: query
+        name: meal_type
+        type: string
+      - description: Result limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: History retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get meal history
+      tags:
+      - meals
+  /meals/participation:
+    post:
+      consumes:
+      - application/json
+      description: Set or update user's participation for a specific meal
+      parameters:
+      - description: Participation details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SetParticipationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Participation updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Set meal participation
+      tags:
+      - meals
+  /meals/participation-audit:
+    get:
+      description: Get meal participation audit trail for current user
+      parameters:
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        type: string
+      - description: Meal type filter
+        in: query
+        name: meal_type
+        type: string
+      - description: Result limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Audit trail retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get participation audit trail
+      tags:
+      - meals
+  /meals/participation/{date}:
+    get:
+      description: Get user's meal participation status for a specific date
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Participation retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get participation by date
+      tags:
+      - meals
+  /meals/participation/override:
+    post:
+      consumes:
+      - application/json
+      description: Admin or team lead can override user's meal participation
+      parameters:
+      - description: Override details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.OverrideParticipationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Participation overridden successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Override participation (Admin/Team Lead)
+      tags:
+      - meals
+  /meals/team-participation:
+    get:
+      description: Get today's meal participation for team lead's team
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team participation retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get team participation
+      tags:
+      - meals
+  /meals/today:
+    get:
+      description: Get tomorrow's meal schedule and user participation status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Meals retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get today's meals
+      tags:
+      - meals
+  /schedules:
+    post:
+      consumes:
+      - application/json
+      description: Create a new meal schedule (Admin/Logistics only)
+      parameters:
+      - description: Schedule details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Schedule created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create schedule
+      tags:
+      - schedules
+  /schedules/{date}:
+    delete:
+      description: Delete a meal schedule (Admin/Logistics only)
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Schedule deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete schedule
+      tags:
+      - schedules
+    get:
+      description: Get meal schedule for a specific date
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Schedule retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get schedule by date
+      tags:
+      - schedules
+    put:
+      consumes:
+      - application/json
+      description: Update an existing meal schedule (Admin/Logistics only)
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: path
+        name: date
+        required: true
+        type: string
+      - description: Update details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateScheduleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Schedule updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update schedule
+      tags:
+      - schedules
+  /schedules/range:
+    get:
+      description: Get meal schedules within a date range
+      parameters:
+      - description: Start date (YYYY-MM-DD)
+        in: query
+        name: start_date
+        required: true
+        type: string
+      - description: End date (YYYY-MM-DD)
+        in: query
+        name: end_date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Schedules retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get schedule range
+      tags:
+      - schedules
+  /users:
+    get:
+      description: Get list of all users (Admin/Logistics only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Users retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account (Admin only)
+      parameters:
+      - description: User details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/services.CreateUserInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error or creation failed
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create new user
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      description: Deactivate a user account (Admin only)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User deactivated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Deactivation failed
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Deactivate user
+      tags:
+      - users
+    get:
+      description: Get user details (Admin or own profile)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update user details (Admin or own profile)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/services.UpdateUserInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error or update failed
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user
+      tags:
+      - users
+  /users/me/preferences:
+    get:
+      description: Get current user's meal preferences
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Preferences retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user preferences
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update current user's meal preferences
+      parameters:
+      - description: Preference details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdatePreferencesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Preferences updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user preferences
+      tags:
+      - users
+  /users/me/team:
+    get:
+      description: Get team details for authenticated employee
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden - only employees
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my team
+      tags:
+      - users
+  /users/me/team-members:
+    get:
+      description: Get team members for authenticated team lead
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Team members retrieved successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden - only team leads
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my team members
+      tags:
+      - users
+  /wfh-periods:
+    get:
+      description: Get all work-from-home periods (Admin/Logistics only)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: WFH periods retrieved
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List WFH periods
+      tags:
+      - wfh-periods
+    post:
+      consumes:
+      - application/json
+      description: Create a new work-from-home period (Admin/Logistics only)
+      parameters:
+      - description: WFH period details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.createWFHPeriodRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: WFH period created successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create WFH period
+      tags:
+      - wfh-periods
+  /wfh-periods/{id}:
+    delete:
+      description: Delete a work-from-home period (Admin/Logistics only)
+      parameters:
+      - description: WFH Period ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: WFH period deleted successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete WFH period
+      tags:
+      - wfh-periods
+  /work-location:
+    get:
+      description: Get work location for current user on a specific date
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Work location retrieved
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get my work location
+      tags:
+      - work-location
+    post:
+      consumes:
+      - application/json
+      description: Set work location (office/wfh) for current user on a specific date
+      parameters:
+      - description: Location details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.setLocationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Work location updated successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Set my work location
+      tags:
+      - work-location
+  /work-location/list:
+    get:
+      description: Get all users' work locations for a specific date (Admin/Team Lead
+        only)
+      parameters:
+      - description: Date (YYYY-MM-DD)
+        in: query
+        name: date
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Work locations retrieved
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List work locations by date
+      tags:
+      - work-location
+  /work-location/monthly-summary:
+    get:
+      description: Get monthly work-from-home summary for current user
+      parameters:
+      - description: Month (YYYY-MM, defaults to current month)
+        in: query
+        name: month
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly WFH summary retrieved
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get monthly WFH summary
+      tags:
+      - work-location
+  /work-location/override:
+    post:
+      consumes:
+      - application/json
+      description: Set work location for another user (Admin/Team Lead only)
+      parameters:
+      - description: Override details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.adminSetLocationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Work location corrected successfully
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Override work location
+      tags:
+      - work-location
+  /work-location/team-monthly-report:
+    get:
+      description: Get monthly work-from-home report for team (Admin/Logistics/Team
+        Lead only)
+      parameters:
+      - description: Month (YYYY-MM, defaults to current month)
+        in: query
+        name: month
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Monthly WFH report retrieved
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Validation error
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+        "403":
+          description: Forbidden
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get team monthly WFH report
+      tags:
+      - work-location
+schemes:
+- http
+- https
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
