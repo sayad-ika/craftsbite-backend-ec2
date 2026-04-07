@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "trainee-2026-sayad-craftsbite-tfstate"
+    bucket = "trainee-2026-sayad-craftsbite"
     key    = "craftsbite/terraform.tfstate"
     region = "ap-southeast-1"
   }
