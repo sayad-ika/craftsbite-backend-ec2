@@ -6,7 +6,7 @@
 
 CraftsBite Backend is a production-ready server-side application for managing daily office meals, user participation, headcount reporting, and team management. The system supports role-based access control, flexible scheduling, bulk operations, and real-time participation tracking.
 
-Built following clean architecture principles with distinct layers for handlers, services, repositories, and models, ensuring maintainability, testability, and scalability.
+Built following clean architecture principles with distinct layers for handlers, services, repositories, and models, ensuring maintainability, testability, and scalability. 
 
 ## ✨ Key Features
 
